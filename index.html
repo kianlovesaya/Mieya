@@ -1,73 +1,178 @@
-<script>
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const img = new Image();
-  img.src = 'mieya.jpg'; // HARUS SAMA persis dengan yang di GitHub
-
-  const particles = [];
-
-  function heartFunction(t) {
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-    return { x, y };
-  }
-
-  class Particle {
-    constructor() {
-      const t = Math.random() * Math.PI * 2;
-      const pos = heartFunction(t);
-      this.x = canvas.width / 2 + pos.x * 15;
-      this.y = canvas.height / 2 - pos.y * 15;
-      this.size = Math.random() * 20 + 10;
-      this.alpha = 1;
-      this.speedY = Math.random() * 0.5 + 0.3;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: pink;
     }
 
-    update() {
-      this.y += this.speedY;
-      this.alpha -= 0.008;
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
 
-    draw() {
-      if (img.complete) {
+    .center-text {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      font-family: 'Pacifico', cursive;
+      color: pink;
+      text-shadow: 0 0 10px white;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .side-text {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%);
+      width: 300px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: pink;
+      text-shadow: 0 0 5px white;
+      z-index: 2;
+      white-space: pre-line;
+      overflow-wrap: break-word;
+      animation: blink 2s infinite alternate;
+    }
+
+    @keyframes blink {
+      0%   { opacity: 0.5; text-shadow: 0 0 5px pink; }
+      100% { opacity: 1;   text-shadow: 0 0 15px white; }
+    }
+
+    .image-fadein {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px pink;
+      opacity: 0;
+      animation: fadein 4s ease-in-out 3s forwards;
+      z-index: 3;
+    }
+
+    @keyframes fadein {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="center-text">Kian Love Mieya The Most.</div>
+  <div class="side-text" id="typing-text"></div>
+  <img src="c:\kian\mieya.jpg" alt="Love Image" class="image-fadein">
+  <canvas id="canvas"></canvas>
+
+  <script>
+    // TEXT TYPEWRITER EFFECT
+    const text = `I'm in love with you. And I love that I'm in love with you.
+I love the feelings.
+The happiness when I think of you,
+the butterflies when you text me,
+the excitement I get when I know I'll get to see you.
+It's amazing.
+And you're amazing,
+and I love you.`;
+
+    const typingElement = document.getElementById("typing-text");
+    let index = 0;
+
+    function typeText() {
+      if (index < text.length) {
+        typingElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(typeText, 50);
+      }
+    }
+
+    typeText();
+
+    // CANVAS LOVE PARTICLES
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+
+    function heartFunction(t) {
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      return { x, y };
+    }
+
+    class Particle {
+      constructor() {
+        const t = Math.random() * Math.PI * 2;
+        const pos = heartFunction(t);
+        this.x = canvas.width / 2 + pos.x * 15;
+        this.y = canvas.height / 2 - pos.y * 15;
+        this.size = Math.random() * 4 + 1;
+        this.alpha = 1;
+        this.speedY = Math.random() * 0.5 + 0.2;
+      }
+
+      update() {
+        this.y += this.speedY;
+        this.alpha -= 0.01;
+      }
+
+      draw() {
         ctx.save();
         ctx.globalAlpha = this.alpha;
-        ctx.drawImage(img, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+        ctx.fillStyle = "pink";
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.bezierCurveTo(this.x, this.y - this.size, this.x - this.size, this.y - this.size, this.x - this.size, this.y);
+        ctx.bezierCurveTo(this.x - this.size, this.y + this.size, this.x, this.y + this.size * 1.5, this.x, this.y + this.size * 2);
+        ctx.bezierCurveTo(this.x, this.y + this.size * 1.5, this.x + this.size, this.y + this.size, this.x + this.size, this.y);
+        ctx.bezierCurveTo(this.x + this.size, this.y - this.size, this.x, this.y - this.size, this.x, this.y);
+        ctx.fill();
         ctx.restore();
       }
     }
-  }
 
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < 5; i++) {
-      if (particles.length < 1000) {
-        particles.push(new Particle());
+      // Tambahkan lebih banyak partikel per frame
+      for (let j = 0; j < 5; j++) {
+        if (particles.length < 1000) {
+          particles.push(new Particle());
+        }
       }
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        if (particles[i].alpha <= 0) {
+          particles.splice(i, 1);
+          i--;
+        }
+      }
+
+      requestAnimationFrame(animate);
     }
 
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update();
-      particles[i].draw();
-
-      if (particles[i].alpha <= 0) {
-        particles.splice(i, 1);
-        i--;
-      }
-    }
-
-    requestAnimationFrame(animate);
-  }
-
-  img.onload = () => {
     animate();
-  };
-
-  img.onerror = () => {
-    alert("❌ Gambar 'mieya.jpg' tidak ditemukan.\nPastikan file berada di repo dan ejaannya benar.");
-  };
-</script>
+  </script>
+</body>
+</html>
